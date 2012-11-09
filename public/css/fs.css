@@ -1,0 +1,13 @@
+.toolbar .button {
+	float: left;
+}
+
+.toolbar {
+	clear: both;
+}
+
+.fs-item {
+	background-repeat: no-repeat;
+	padding: 10px;
+	padding-left: 30px;
+}

@@ -1,6 +1,6 @@
 define(function(require) {
 
-	var Drive = require('fs/providers/google_drive');
+	var Drive = require('fs/provider/google_drive');
 	var Presenter = require('fs/presenter');
 
 	var providers = {

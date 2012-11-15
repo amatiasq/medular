@@ -1,13 +1,13 @@
 define(function(require) {
 
 	var $ = require('$');
-	var events = require('helpers/events');
+	var events = require('helper/events');
 	var template = require('tmpl!fs/container');
 	var itemTemplate = require('tmpl!fs/item');
 
 	function FSPresenter(provider) {
 		this.provider = provider;
-		this.dom = {
+		this.view = {
 			container: null,
 			content: null
 		};
@@ -35,10 +35,9 @@ define(function(require) {
 		},
 
 		render: function(parent) {
-
-			var main = this.dom.container = template({}).extended().render();
-			this.dom.content = $('.content', main);
-			events.apply(main, this.events, this);
+			var main = this.view.container = template({}).extended().render();
+			this.view.content = $('.content', main);
+			events.listen(main, this.events, this);
 
 			this.render = function(parent) {
 				if (parent)
@@ -61,11 +60,11 @@ define(function(require) {
 			});
 
 			console.log(nodes);
-			this.dom.content.html(nodes.join(''));
+			this.view.content.html(nodes.join(''));
 		},
 
 		clear: function() {
-			this.dom.content.html('');
+			this.view.content.html('');
 		}
 	};
 

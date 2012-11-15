@@ -2,8 +2,19 @@ require.config({
 	baseUrl: 'js/',
 
 	paths: {
-		'$': 'vendor/zepto',
-		'templates': '../tmpl'
+		'$': 'vendor/jquery',
+		'Underscore': 'vendor/underscore',
+		'template': '../tmpl'
+	},
+
+	shim: {
+		'$': {
+			'exports': '$'
+		},
+
+		'Underscore': {
+			'exports': '_'
+		}
 	}
 });
 

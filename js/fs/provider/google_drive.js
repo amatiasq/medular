@@ -1,7 +1,7 @@
 define(function(require) {
 	
 	require('https://apis.google.com/js/client.js');
-	var Promise = require('helpers/promise');
+	var Promise = require('helper/promise');
 
 	function GoogleDriveAdapter() { }
 	GoogleDriveAdapter.prototype = {

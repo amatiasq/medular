@@ -1,12 +1,13 @@
 define(function(require) {
 
-    var text = require('vendor/text'),
-    	Handlebars = require('vendor/handlebars'),
-        cache = [];
+    var text = require('vendor/text');
+    var Handlebars = require('vendor/handlebars');
+    var view = require('core/view');
+    var cache = [];
 
     function load(name, parentRequire, done, config) {
-        text.load('templates/' + name + '.mustache', parentRequire, function(template) {
-            done(cache[name] = Handlebars.compile(template));
+        text.load('template/' + name + '.mustache', parentRequire, function(template) {
+            done(cache[name] = view(Handlebars.compile(template)));
         }, config);
     }
 

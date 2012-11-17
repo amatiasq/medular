@@ -1,0 +1,56 @@
+$toolbar-height: 50px;
+$sidebar-width: 20%;
+$footer-height: 20px;
+
+html, body, div {
+	padding: 0;
+	margin: 0;
+}
+html, body, #main-container, .panel {
+	height: 100%;
+}
+
+.panel {
+	margin-left: 64px;
+	position: relative;
+}
+
+.title, .toolbar, .sidebar, .content, .footer {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	top: 0;
+}
+
+.title {
+	background-color: red;
+	width: $sidebar-width;
+	height: $toolbar-height;
+}
+
+.toolbar {
+	background-color: yellow;
+	left: $sidebar-width;
+	height: $toolbar-height;
+}
+
+.sidebar {
+	background-color: green;
+	top: $toolbar-height;
+	width: $sidebar-width;
+	bottom: $footer-height;
+}
+
+.content {
+	background-color: blue;
+	top: $toolbar-height;
+	left: $sidebar-width;
+	bottom: $footer-height;
+}
+
+.footer {
+	background-color: red;
+	height: $footer-height;
+	top: auto;
+}

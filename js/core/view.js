@@ -53,6 +53,14 @@ define(function(require) {
 		return this;
 	}
 
+	function append(obj) {
+		return this.$el.append(obj);
+	}
+
+	function find(selector) {
+		return this.$el.find(selector);
+	}
+
 	return function(template) {
 
 		function View(options) {
@@ -66,7 +74,9 @@ define(function(require) {
 			constructor: View,
 			template: template,
 			listen: listen,
-			elements: elements
+			elements: elements,
+			append: append,
+			find: find
 		};
 
 		return View;

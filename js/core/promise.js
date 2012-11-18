@@ -251,8 +251,7 @@
 				i.callback.apply(i.scope, args);
 			}
 
-			this._fn[type].forEach(invoke);
-			this._fn['finally'].forEach(invoke);
+			var callbacks = this._fn[type].concat(this._fn['finally']);
 
 			this._fn = {
 				'success': false,
@@ -262,6 +261,8 @@
 
 			this._args = args;
 			this._fn[type] = true;
+
+			callbacks.forEach(invoke);
 		},
 
 		/**

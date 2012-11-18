@@ -67,6 +67,50 @@ define(function(require) {
 
 	return {
 		notes: new CRUD('notes', [ 'title', 'content' ]),
-		notebooks: new CRUD('notes_notebook', [ 'title', 'parent' ])
+		notebooks: new CRUD('notes_notebook', [ 'title', 'parent' ]),
+
+		getTree: function() {
+
+			return Promise.parallel(
+				this.notebooks.find(),
+				this.notes.find()
+			).transform(function(books, notes) {
+
+				var byId = {};
+				var tree = {
+					title: 'root',
+					books: [],
+					notes: []
+				};
+
+				books[0].forEach(function(data) {
+					var book = byId[data.id] = {
+						id: data.id,
+						title: data.title,
+						books: [],
+						notes: []
+					};
+
+					if (data.parent)
+						byId[data.parent].books.push(book);
+					else
+						tree.books.push(book);
+				});
+
+				notes[0].forEach(function(data) {
+					var note = {
+						id: data.id,
+						title: data.title
+					};
+
+					if (data.parent)
+						byId[data.parent].notes.push(note);
+					else
+						tree.notes.push(note);
+				});
+
+				return tree;
+			});
+		}
 	};
 });

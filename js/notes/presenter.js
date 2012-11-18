@@ -1,10 +1,12 @@
 define(function(require) {
-	
+
 	var $ = require('$');
 	var Tree = require('notes/tree');
 	var view = require('tmpl!notes/main');
 
-	function NotesPresenter() {
+	function NotesPresenter(provider) {
+		this.provider = provider;
+
 		this.view = {
 			main: null,
 			title: null,
@@ -17,7 +19,7 @@ define(function(require) {
 
 		this.events = {
 			'$newNote click': 'createNote',
-			'$search click': 'search',
+			'$search click': 'search'
 		};
 	}
 
@@ -26,25 +28,16 @@ define(function(require) {
 
 		render: function(parent) {
 			var main = view()
-				.elements(this.view)
+				.extract(this.view)
 				.listen(this.events, this);
 
 			var tree = new Tree().render(this.view.sidebar);
 
-			tree.addNode({
-				title: 'root',
-				children: [{
-					title: 'Inbox'
-				}, {
-					title: 'Programacion',
-					children: [{
-						title: 'General'
-					}, {
-						title: 'JS'
-					}, {
-						title: 'Dart'
-					}]
-				}]
+			this.provider.find().then(function(list) {
+				tree.addNode({
+					title: 'root',
+					children: list
+				});
 			});
 
 			this.render = function(parent) { $(parent).append(main); return this; };

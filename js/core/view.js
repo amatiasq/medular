@@ -4,14 +4,23 @@ define(function(require) {
 	var _ = require('Underscore');
 	var splitter = /^(?:(.*)\s)?(\w+)$/;
 
-	var original = $.fn.append;
-	$.fn.extend({
-		append: function() {
-			original.apply(this, _.map(arguments, function(child) {
-				return child.constructor.name === 'View' ? child.$el : child;
-			}));
-		}
-	});
+	function extract(map) {
+		var ref = this._lorelei_ref = {};
+
+		_.each(map, function(value, name) {
+			if (name === 'main')
+				return map.main = this;
+
+			var selector = value || ('.' + name);
+			map[name] = this.find(selector);
+			ref[name] = selector;
+
+			if (!map[name].length)
+				throw new Error('No element found for selector ' + selector);
+		}, this);
+
+		return this;
+	}
 
 	function listen(map, scope) {
 		_.each(map, function(handler, key) {
@@ -20,7 +29,7 @@ define(function(require) {
 			event = data[2];
 
 			if (selector[0] === '$')
-				selector = this.ref[selector];
+				selector = this._lorelei_ref[selector.substr(1)];
 
 			if (typeof handler === 'string')
 				handler = scope[handler];
@@ -28,58 +37,20 @@ define(function(require) {
 			if (!handler)
 				throw new Error('Handler not found');
 
-			if (selector)
-				this.$el.delegate(event, handler.bind(scope));
-			else
-				this.$el.bind(event, handler.bind(scope));
+			this.delegate(selector, event, handler.bind(scope));
 		}, this);
 
 		return this;
 	}
 
-	function elements(map) {
-		_.each(map, function(value, name) {
-			if (name === 'main')
-				return map.main = this.$el;
-
-			var selector = value || ('.' + name);
-			map[name] = this.$el.find(selector);
-
-			if (!map[name].length)
-				throw new Error('No element found for selector ' + selector);
-		}, this);
-
-		this.ref = map;
-		return this;
-	}
-
-	function append(obj) {
-		return this.$el.append(obj);
-	}
-
-	function find(selector) {
-		return this.$el.find(selector);
-	}
+	$.fn.extend({
+		extract: extract,
+		listen: listen
+	});
 
 	return function(template) {
-
-		function View(options) {
-			if (!(this instanceof View))
-				return new View(options);
-
-			this.$el = $(this.template(options || {}));
-		}
-
-		View.prototype = {
-			constructor: View,
-			template: template,
-			listen: listen,
-			elements: elements,
-			append: append,
-			find: find
+		return function(options) {
+			return $(template(options || {}));
 		};
-
-		return View;
-
 	};
 });

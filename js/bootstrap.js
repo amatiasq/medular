@@ -34,7 +34,7 @@ require([ 'main' ]);
 
 		return cache[plain] = new ExtendedString(plain);
 	}
-	
+
 	function ExtendedString(plain) { this._native = plain; }
 	ExtendedString.prototype = {
 		render: function() {
@@ -54,4 +54,10 @@ require([ 'main' ]);
 	}
 
 })();
+
+function debug(key, moduleName) {
+	require([moduleName], function(module) {
+		window[key] = module
+	})
+}
 

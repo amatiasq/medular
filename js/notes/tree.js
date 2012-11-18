@@ -1,5 +1,5 @@
 define(function(require) {
-	
+
 	var $ = require('$');
 	var _ = require('Underscore');
 	var view = require('tmpl!notes/tree');
@@ -11,7 +11,11 @@ define(function(require) {
 		};
 
 		this.events = {
-			//'.parent click': 'nada'
+			'.parent click': 'toggleParent',
+			'.parent > span click': 'toggleParent',
+			'.tree-node:not(.parent) click': function(e) {
+				console.log("CLicked " + $(e.target).attr('data-id'));
+			}
 		};
 	}
 
@@ -20,11 +24,16 @@ define(function(require) {
 
 		render: function(parent) {
 			var main = view()
-				.elements(this.view)
+				.extract(this.view)
 				.listen(this.events, this);
 
 			this.render = function(parent) { $(parent).append(main); return this; };
 			return this.render(parent);
+		},
+
+		toggleParent: function(event) {
+			$(event.target).toggleClass('closed');
+			event.stopPropagation()
 		},
 
 		addNode: function(data, parent) {

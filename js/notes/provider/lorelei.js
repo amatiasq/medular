@@ -3,26 +3,70 @@ define(function(require) {
 	var ajax = require('core/ajax');
 	var Promise = require('core/promise');
 
-	function findNotes() {
-		return ajax.db('SELECT * FROM notes');
+	function CRUD(table, fields) {
+		this.table = table;
+		this.fields = fields;
 	}
 
-	function createNote(title, content) {
-		return ajax.db('INSERT INTO notes (title,content) VALUES ("' + title + '","' + content + '")');
-	}
+	CRUD.prototype = {
+		constructor: CRUD,
 
-	function deleteNote(id) {
-		return ajax.db('DELETE FROM notes WHERE id=' + id);
-	}
+		create: function(data) {
+			var values;
 
-	function editNote(id, title, content) {
-		return ajax.db('UPDATE notes SET title="' + title + '", content="' + content + '" WHERE id=' + id);
-	}
+			if (typeof data === 'object') {
+				values = this.fields.map(function(field) {
+					return field in data ? data[field] : 'NULL';
+				});
+			} else {
+				values = Array.prototype.slice.call(arguments);
+				for (var i = values.length; i < this.fields.length; i++)
+					values.push('NULL');
+			}
+
+			return ajax.db(
+				'INSERT INTO ' + this.table + ' (' + this.fields.join(',') +
+				') VALUES ("' + values.join('","') + '")'
+			).transform(function(data) {
+				return data.insertId;
+			});
+		},
+
+		retrieve: function() {
+			return ajax.db('SELECT * FROM ' + this.table);
+		},
+
+		update: function(data) {
+			var set;
+
+			if (typeof data === 'object') {
+				set = this.fields.filter(function(field) {
+					return field in data;
+				}).map(function(field) {
+					return field + '="' + data[field] + '"'
+				});
+			} else {
+				set = Array.prototype.slice.call(arguments).map(function(val, index) {
+					return this.fields[index] + '="' + val + '"';
+				}, this);
+			}
+
+			return ajax.db('UPDATE ' + this.table + ' SET ' + set.join(',') + ' WHERE id=' + data.id);
+		},
+
+		delete: function(id) {
+			if (typeof id !== 'number')
+				id = id.id;
+
+			return ajax.db('DELETE FROM ' + this.table + ' WHERE id=' + id);
+		}
+	};
+
+	CRUD.prototype.remove = CRUD.prototype['delete'];
+	CRUD.prototype.find = CRUD.prototype.retrieve;
 
 	return {
-		find: findNotes,
-		create: createNote,
-		'delete': deleteNote,
-		edit: editNote
+		notes: new CRUD('notes', [ 'title', 'content' ]),
+		notebooks: new CRUD('notes_notebook', [ 'title', 'parent' ])
 	};
 });

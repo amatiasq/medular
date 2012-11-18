@@ -10,13 +10,9 @@ define(function(require) {
 	}
 
 	function requestJson(method, url, headers, data) {
-		var promise = new Promise();
-
-		request(method, url, headers, data).then(function(response) {
-			promise.done(JSON.parse(response));
-		})
-
-		return promise.getFuture();
+		return request(method, url, headers, data).transform(function(response) {
+			return JSON.parse(response);
+		});
 	}
 
 	function request(method, url, headers, data) {

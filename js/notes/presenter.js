@@ -33,7 +33,7 @@ define(function(require) {
 
 			var tree = new Tree().render(this.view.sidebar);
 
-			this.provider.find().then(function(list) {
+			this.provider.notes.find().then(function(list) {
 				tree.addNode({
 					title: 'root',
 					children: list

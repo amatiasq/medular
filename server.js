@@ -2,6 +2,11 @@ var http = require('http');
 var mysql = require('mysql');
 var StaticServer = require('node-static').Server;
 
+var red = '\033[31m';
+var blue = '\033[34m';
+var green = '\033[32m';
+var reset = '\033[0m';
+
 var file = new StaticServer('.', {
 	cache: 600,
 	headers: {
@@ -9,14 +14,26 @@ var file = new StaticServer('.', {
 	}
 });
 
+function fail(id, error) {
+	console.log(
+		red + '{{FAILED}} ' + reset + id +
+		(error ? '\n\t' + red + error.message + reset : '')
+	);
+}
+
+function log(type, id, data) {
+	var text = blue + '[' + type + '][' + id + '] ' + green + data + reset;
+	console.log(text);
+	return text;
+}
+
 function serveFile(id, request, response) {
-	id = '[Static][' + id + '] ' + request.url;
-	console.log(id);
+	id = log('Static', id, request.url);
 
 	request.addListener('end', function() {
 		file.serve(request, response, function(error, result) {
 			if (error) {
-				console.log('{{FAILED}} ' + id);
+				fail(id, error);
 				response.writeHead(error.status, error.headers);
 				response.end();
 			}
@@ -26,8 +43,7 @@ function serveFile(id, request, response) {
 
 function proxy(id, request, response) {
 	var url = request.url.substr('/proxy'.length);
-	id = '[Proxy][' + id + '] http://' + request.headers['x-proxy-host'] + url;
-	console.log(id);
+	id = log('Proxy', id, 'http://' + request.headers['x-proxy-host'] + url);
 
 	var proxy_request = http.request({
 		method: 'POST',
@@ -45,7 +61,7 @@ function proxy(id, request, response) {
 	});
 
 	proxy_request.on('error', function(e) {
-		console.log('{{FAILED}} ' + id);
+		fail(id, e);
 	});
 
 	request.addListener('data', function(chunk) {
@@ -59,8 +75,7 @@ function proxy(id, request, response) {
 
 function database(id, request, response) {
 	var query = request.headers['x-query'];
-	id = '[DB][' + id + '] ' + query;
-	console.log(id)
+	id = log('DB', id, query);
 
 	connection = mysql.createConnection({
 		user: 'lorelei',
@@ -74,7 +89,8 @@ function database(id, request, response) {
 
 	connection.query(query, function selectPlayers(err, rows, fields) {
 		if (err) {
-			console.log('{{FAILED}} ' + id);
+			console.log(err.message);
+			fail(id, err);
 		} else {
 			response.write(JSON.stringify(rows), 'utf8');
 		}

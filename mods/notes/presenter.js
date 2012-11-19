@@ -1,7 +1,7 @@
 define(function(require) {
 
 	var $ = require('$');
-	var Tree = require('notes/tree');
+	var Tree = require('tree');
 	var view = require('tmpl!notes/main');
 
 	function NotesPresenter(provider) {

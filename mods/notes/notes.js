@@ -1,8 +1,8 @@
 define(function(require) {
 
 	var $ = require('$');
-	var Presenter = require('notes/presenter');
-	var lorelei = require('notes/provider/lorelei')
+	var Presenter = require('presenter');
+	var lorelei = require('provider/lorelei')
 	var template = require('tmpl!notes/main');
 
 	var providers = {

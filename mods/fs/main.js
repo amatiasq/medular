@@ -1,7 +1,7 @@
+//	var Drive = require('provider/google_drive');
+//	var Presenter = require('presenter');
 define(function(require) {
 
-	var Drive = require('fs/provider/google_drive');
-	var Presenter = require('fs/presenter');
 
 	var providers = {
 		'google-drive': Drive

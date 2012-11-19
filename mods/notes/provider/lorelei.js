@@ -1,6 +1,6 @@
 define(function(require) {
 
-	var ajax = require('core/ajax');
+	var ajax = require('core/server');
 	var Promise = require('core/promise');
 
 	function CRUD(table, fields) {

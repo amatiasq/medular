@@ -1,5 +1,5 @@
 var http = require('http');
-var Logger = require('./logger');
+var Logger = require('../logger');
 
 function proxy(method, host, url, post, callback) {
 	var request = http.request({
@@ -38,7 +38,8 @@ function proxy(method, host, url, post, callback) {
 	request.end();
 }
 
-module.exports = function(data, callback) {
+exports.id = 'PROXY';
+exports.handler = function(data, callback) {
 	proxy(data.method, data.host, data.uri, data.data, callback);
 };
 

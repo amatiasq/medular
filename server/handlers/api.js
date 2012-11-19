@@ -1,6 +1,5 @@
 var fs = require('fs');
-var config = require('./config');
-var core = require('./core-api');
+var core = require('./api/core');
 
 var modules = { core: core };
 
@@ -12,6 +11,7 @@ function api(module, action, data, callback) {
 	modules[module][action](data, callback);
 }
 
-module.exports = function(data, callback) {
+exports.id = 'API';
+exports.handler = function(data, callback) {
 	api(data.module, data.action, data.data, callback);
 };

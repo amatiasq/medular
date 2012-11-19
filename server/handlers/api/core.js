@@ -1,5 +1,4 @@
 var fs = require('fs');
-var config = require('./config');
 var Promise = require('./promise');
 
 exports['get-initial-data'] = function(data, callback) {
@@ -18,9 +17,7 @@ exports['modules-data'] = function(data, callback) {
 		});
 	}
 
-	var modsPath = config.root + 'mods';
-
-	fs.readdir(modsPath, function(error, files) {
+	fs.readdir('mods', function(error, files) {
 		if (error) {
 			console.log(error);
 			return callback(error);}
@@ -28,7 +25,7 @@ exports['modules-data'] = function(data, callback) {
 		Promise.all(files.map(function(file) {
 			var prom = new Promise();
 			var data = { name: file };
-			var manifest = modsPath + '/' + file + '/manifest.json';
+			var manifest = 'mods/' + file + '/manifest.json';
 
 			if (file[0] == '_')
 				return;

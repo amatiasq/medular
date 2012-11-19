@@ -20,6 +20,7 @@ function database(query, callback) {
 	});
 }
 
-module.exports = function(data, callback) {
+exports.id = 'DATA';
+exports.handler = function(data, callback) {
 	database(data.query, callback);
 };

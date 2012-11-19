@@ -24,7 +24,7 @@ define(function(require) {
 					values.push('NULL');
 			}
 
-			return ajax.db(
+			return ajax.data(
 				'INSERT INTO ' + this.table + ' (' + this.fields.join(',') +
 				') VALUES ("' + values.join('","') + '")'
 			).transform(function(data) {
@@ -33,7 +33,7 @@ define(function(require) {
 		},
 
 		retrieve: function() {
-			return ajax.db('SELECT * FROM ' + this.table);
+			return ajax.data('SELECT * FROM ' + this.table);
 		},
 
 		update: function(data) {
@@ -51,14 +51,14 @@ define(function(require) {
 				}, this);
 			}
 
-			return ajax.db('UPDATE ' + this.table + ' SET ' + set.join(',') + ' WHERE id=' + data.id);
+			return ajax.data('UPDATE ' + this.table + ' SET ' + set.join(',') + ' WHERE id=' + data.id);
 		},
 
 		delete: function(id) {
 			if (typeof id !== 'number')
 				id = id.id;
 
-			return ajax.db('DELETE FROM ' + this.table + ' WHERE id=' + id);
+			return ajax.data('DELETE FROM ' + this.table + ' WHERE id=' + id);
 		}
 	};
 

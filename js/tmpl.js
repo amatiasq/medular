@@ -6,7 +6,8 @@ define(function(require) {
     var cache = [];
 
     function load(name, parentRequire, done, config) {
-        text.load('template/' + name + '.mustache', parentRequire, function(template) {
+        var file = ((config.tmpl.path + '/') || '') + name + (config.tmpl.extension || '');
+        text.load(file, parentRequire, function(template) {
             done(cache[name] = view(Handlebars.compile(template)));
         }, config);
     }

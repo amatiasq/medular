@@ -2,8 +2,8 @@ define(function(require) {
 
 	var $ = require('$');
 	var _ = require('Underscore');
-	var view = require('tmpl!notes/tree');
-	var nodeView = require('tmpl!notes/tree-node');
+	var view = require('tmpl!tree');
+	var nodeView = require('tmpl!tree-node');
 
 	function Tree() {
 		this.view = {

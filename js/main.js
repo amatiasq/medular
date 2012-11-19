@@ -1,33 +1,66 @@
 define(function(require) {
 
+	require('css!../css/normalize.less')
+	require('css!../css/basic.less')
+	require('css!../css/main.less')
+
 	var _ = require('Underscore');
 	var server = require('core/server')
 
+	var defaultManifest = {
+		"description": "",
+		"server": {
+			"shell": "node server/main"
+		},
+
+		"client": {
+			"root-folder": "client/js",
+			"main": "main",
+			"requirejs-config": null
+		}
+	};
+
+	function clone(obj) {
+		return JSON.parse(JSON.stringify(obj));
+	}
+
+
 	function init(cfg) {
-		var config = _.extend({ }, cfg);
-
+		var config = clone(cfg);
 		_.each(config.paths, function(value, key) {
-			if (key !== 'template')
-				value = '../../js/' + value;
-
-			console.log(key + '=' + value);
-			config.paths[key] = value;
+			config.paths[key] = 'js/' + value;
 		});
 
 		server.api('core', 'get-initial-data').then(function(data) {
-			data.forEach(function(module) {
-				if (module === 'fs')
-					return;
+			data.modules.forEach(function(data) {
+				if (!data.success)
+					return console.error('Cannot load module "' + data.name + '": ' + data.error.message);
 
-				var modRequire = requirejs.config(_.defaults({
-					context: module,
-					baseUrl: 'mods/' + module
-				}, config));
-
-				modRequire([ 'main' ], function(main) {
-					main.init($('#main-container'));
+				_.each(defaultManifest, function(section, name) {
+					_.defaults(data.config[name], section);
 				});
 
+				var base = 'mods/' + data.name + '/' + data.config.client['root-folder'];
+
+				if (base[base.length - 1] === '/')
+					base.length--;
+
+				var toRoot = new Array(base.split('/').length + 1).join('../');
+				var localConfig = _.defaults({
+					context: data.name,
+					baseUrl: base,
+					paths: {}
+				}, config);
+
+				_.each(config.paths, function(value, key) {
+					localConfig.paths[key] = toRoot + value;
+				});
+
+				_.extend(localConfig, data.config.client['requirejs-config']);
+
+				requirejs.config(localConfig)([ data.config.client.main ], function(main) {
+					main.init($('#main-container'));
+				});
 			});
 		});
 	}
@@ -35,31 +68,4 @@ define(function(require) {
 	return {
 		init: init
 	};
-
-
-
-
-	//new (require('notes/main'))('lorelei', $('#main-container'));
-
-	/*
-	require('core/server').api('core', 'get-initial-data').then(function(data) {
-
-	}, function(error) {
-		console.error(error)
-		alert(error.message);
-	});
-	*/
-
-	//var FS = requie('fs');
-	//var fs = new FS('google-drive', document.getElementById('main-container'));
-
-	/*
-	require('notes/provider/lorelei').getTree().then(function(tree) {
-		console.log(tree);
-	}, function(err) {
-		console.log('ERROR');
-		console.log(err);
-	});
-	*/
-
 });

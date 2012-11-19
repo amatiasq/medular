@@ -12,10 +12,10 @@
 			'vendor': 'vendor',
 			'core': 'core',
 			'tmpl': 'tmpl',
+			'css': 'css',
 
 			'$': 'vendor/jquery',
 			'Underscore': 'vendor/underscore',
-			'template': '../../tmpl',
 		},
 
 		shim: {
@@ -31,7 +31,7 @@
 
 	require.config(config)([ '../js/main' ], function(main) {
 		setTimeout(function() {
-			main.init(config)
+			main.init(config);
 		}, 1000);
 	});
 

@@ -1,8 +1,10 @@
 define(function(require) {
 
+	require('css!../css/main.less');
+
 	var $ = require('$');
 	var Tree = require('tree');
-	var view = require('tmpl!notes/main');
+	var view = require('tmpl!main');
 
 	function NotesPresenter(provider) {
 		this.provider = provider;

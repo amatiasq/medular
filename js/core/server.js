@@ -7,18 +7,21 @@ define(function(require) {
 	 * SOCKET *
 	 **********/
 
+	var log = true;
 	var requests = {};
 	var conn = new WebSocket('ws://' + location.hostname + ':1337');
 
 	conn.onopen = function() {};
 	conn.onerror = function(error) {
-		console.log("ERROR ON WEBSOCKET");
+		console.error("ERROR ON WEBSOCKET:" + error.message);
 	};
 	conn.onmessage = function (event) {
 		var data = JSON.parse(event.data);
 		var promise = requests[data.requestId];
 
-		console.log('[SOCKET][' + data.requestId + '][RESPONSE] ' + event.data);
+		if (log)
+			console.log('[SOCKET][' + data.requestId + '][RESPONSE] ' + event.data);
+
 		if (data.success)
 			promise.done(data.content);
 		else
@@ -36,9 +39,10 @@ define(function(require) {
 			data: data
 		});
 
-		console.log('[SOCKET][' + id + '][SEND] ' + json);
-		conn.send(json);
+		if (log)
+			console.log('[SOCKET][' + id + '][SEND] ' + json);
 
+		conn.send(json);
 		return promise.getFuture();
 	}
 
@@ -63,8 +67,8 @@ define(function(require) {
 		});
 	}
 
-	function db(query) {
-		return message('DATABASE', {
+	function data(query) {
+		return message('DATA', {
 			query: query
 		});
 	}
@@ -130,7 +134,7 @@ define(function(require) {
 		post: post,
 		json: json,
 		proxy: proxy,
-		db: db,
+		data: data,
 		api: api
 	};
 });

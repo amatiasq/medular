@@ -378,7 +378,7 @@
 	if (typeof module !== 'undefined' && module.exports)
 		module.exports = Promise;
 	else if (typeof define !== 'undefined' && define.amd)
-		define(function() { return Promise });
+		define(function() { return Promise; });
 	else
 		root.Promise = Promise;
 

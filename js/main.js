@@ -6,6 +6,7 @@ define(function(require) {
 
 	var _ = require('Underscore');
 	var server = require('core/server')
+	var Bus = require('core/bus');
 
 	var defaultManifest = {
 		"description": "",
@@ -24,11 +25,17 @@ define(function(require) {
 		return JSON.parse(JSON.stringify(obj));
 	}
 
+	function associativeMap(associative, iterator) {
+		_.object(_.keys(associative), _.map(associative, iterator));
+	}
 
 	function init(cfg) {
+		var modulesBus = new Bus();
 		var config = clone(cfg);
-		_.each(config.paths, function(value, key) {
-			config.paths[key] = 'js/' + value;
+		config.paths = associativeMap(config.paths, function(value) { return 'js/' + value });
+
+		modulesBus.listen('core/append-to-screen', function(dom) {
+			document.getElementById('main-container').appendChild(dom);
 		});
 
 		server.api('core', 'get-initial-data').then(function(data) {
@@ -59,11 +66,13 @@ define(function(require) {
 				_.extend(localConfig, data.config.client['requirejs-config']);
 
 				requirejs.config(localConfig)([ data.config.client.main ], function(main) {
-					main.init($('#main-container'));
+					main.init(modulesBus);
 				});
 			});
 		});
 	}
+
+	window.server = server;
 
 	return {
 		init: init

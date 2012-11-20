@@ -1,51 +1,51 @@
+var fs = require('fs');
+
 var Logger = require('./logger');
+var server = require('./server');
 var socket = require('./socket');
+var modules = require('./handlers');
 
-require('fs').readdir('server/handlers', function(error, files) {
-	if (error) {
-		console.error(error);
-		return;
-	}
-
-	var handlers = {};
-	var modules = {}
-	files.forEach(function(file) {
-		if (file.substr(-3) !== '.js')
-			return;
-
-		var module = require('./handlers/' + file);
-		handlers[module.id] = module.handler;
-		modules[module.id] = module.params;
-	});
-
-	socket(function(id, connection) {
+function addListeners(srv) {
+	srv
+	.on('open', function(id) {
 		Logger.info(id, null, 'CONNECTED');
+	})
+	.on('close', function(id) {
+		Logger.info(id, null, 'CLOSED');
+	})
+	.on('message', function(id, data, callback) {
+		var requestId = data.requestId;
+		Logger.info(id, requestId, 'RECIVED', JSON.stringify(data));
 
-		var init = JSON.stringify({ requestId: null, modules: modules });
-		Logger.info(id, null, 'ANSWER', init);
-		connection.sendUTF(init);
+		modules.resolve(data.type, data.data, function(error, response) {
+			var result = {
+				requestId: requestId,
+				success: !error,
+				content: response || undefined,
+				error: error || undefined
+			};
 
-		connection.on('message', function(event) {
-			if (event.type !== 'utf8') return
-			var data = JSON.parse(event.utf8Data);
+			if (error)
+				Logger.error(id, requestId, 'FAILED', error.message);
+			else
+				Logger.info(id, requestId, 'SUCCESS', JSON.stringify(result));
 
-			Logger.info(id, data.requestId, 'RECIVED', event.utf8Data);
-
-			handlers[data.type](data.data, function(error, response) {
-				var json = JSON.stringify({
-					requestId: data.requestId,
-					success: !error,
-					content: response || undefined,
-					error: error || undefined
-				});
-
-				if (error)
-					Logger.error(id, data.requestId, 'FAILED', error.message);
-				else
-					Logger.info(id, data.requestId, 'SUCCESS', json);
-
-				connection.sendUTF(json);
-			});
+			callback(result);
 		});
 	});
+}
+
+addListeners(server);
+addListeners(socket);
+
+server.on('open-index', function(callback) {
+	fs.readFile('index.mustache', function(err, data) {
+		callback(err, err || data.toString().replace('{{modules}}', JSON.stringify(modules.getApi())));
+	});
 });
+
+server.listen(8080);
+socket.listen(8642);
+
+console.info("Web server listening at 8080");
+console.info("WebSocket listening at 8642");

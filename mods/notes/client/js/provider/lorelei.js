@@ -3,6 +3,8 @@ define(function(require) {
 	var ajax = require('core/server');
 	var Promise = require('core/promise');
 
+	window.ajax =ajax;
+
 	function CRUD(table, fields) {
 		this.table = table;
 		this.fields = fields;

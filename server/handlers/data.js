@@ -21,6 +21,7 @@ function database(query, callback) {
 }
 
 exports.id = 'DATA';
+exports.params = [ 'query' ];
 exports.handler = function(data, callback) {
 	database(data.query, callback);
 };

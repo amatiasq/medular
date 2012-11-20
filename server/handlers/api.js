@@ -12,6 +12,7 @@ function api(module, action, data, callback) {
 }
 
 exports.id = 'API';
+exports.params = [ 'module', 'action', 'data' ];
 exports.handler = function(data, callback) {
 	api(data.module, data.action, data.data, callback);
 };

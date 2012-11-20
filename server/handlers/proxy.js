@@ -39,6 +39,7 @@ function proxy(method, host, url, post, callback) {
 }
 
 exports.id = 'PROXY';
+exports.params = [ 'method', 'host' , 'uri', 'data' ];
 exports.handler = function(data, callback) {
 	proxy(data.method, data.host, data.uri, data.data, callback);
 };

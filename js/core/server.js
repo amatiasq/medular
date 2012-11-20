@@ -12,11 +12,13 @@ define(function(require) {
 	var conn = new WebSocket('ws://' + location.hostname + ':1337');
 
 	conn.onopen = function() {};
-	conn.onerror = function(error) {
-		console.error("ERROR ON WEBSOCKET:" + error.message);
-	};
+	conn.onerror = function(error) { console.error("ERROR ON WEBSOCKET:" + error.message); };
 	conn.onmessage = function (event) {
 		var data = JSON.parse(event.data);
+
+		if (data.requestId === null)
+			return modules(data.modules);
+
 		var promise = requests[data.requestId];
 
 		if (log)
@@ -45,6 +47,22 @@ define(function(require) {
 		conn.send(json);
 		return promise.getFuture();
 	}
+
+	function modules(modules) {
+		_.each(modules, function(params, id) {
+			server[id.toLowerCase()] = function() {
+				_.
+
+				var data = {};
+				var args = arguments;
+				params.forEach(function(param, index) {
+					data[param] = args[index];
+				});
+			};
+		});
+	}
+
+
 
 	/******************
 	 * SOCKET METHODS *
@@ -128,13 +146,12 @@ define(function(require) {
 	}
 
 
-	return {
+	var server = {
 		request: request,
 		get: get,
 		post: post,
-		json: json,
-		proxy: proxy,
-		data: data,
-		api: api
+		json: json
 	};
+
+	return server;
 });

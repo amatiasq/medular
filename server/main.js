@@ -8,16 +8,22 @@ require('fs').readdir('server/handlers', function(error, files) {
 	}
 
 	var handlers = {};
+	var modules = {}
 	files.forEach(function(file) {
 		if (file.substr(-3) !== '.js')
 			return;
 
 		var module = require('./handlers/' + file);
 		handlers[module.id] = module.handler;
+		modules[module.id] = module.params;
 	});
 
 	socket(function(id, connection) {
 		Logger.info(id, null, 'CONNECTED');
+
+		var init = JSON.stringify({ requestId: null, modules: modules });
+		Logger.info(id, null, 'ANSWER', init);
+		connection.sendUTF(init);
 
 		connection.on('message', function(event) {
 			if (event.type !== 'utf8') return

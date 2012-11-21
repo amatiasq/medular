@@ -158,6 +158,9 @@
 	 * @returns <Future> The new future.
 	 */
 	Promise.all = function(futures) {
+		if (!futures || !futures.length)
+			return Promise.done();
+
 		var promise = new Promise();
 		var values = [];
 
@@ -378,7 +381,7 @@
 	if (typeof module !== 'undefined' && module.exports)
 		module.exports = Promise;
 	else if (typeof define !== 'undefined' && define.amd)
-		define(function() { return Promise; });
+		define(function() { return Promise });
 	else
 		root.Promise = Promise;
 

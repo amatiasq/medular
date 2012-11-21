@@ -38,6 +38,9 @@ define(function(require) {
 			document.getElementById('main-container').appendChild(dom);
 		});
 
+		if (!modules.length)
+			console.info("No modules found");
+
 		modules.forEach(function(data) {
 			if (!data.success)
 				return console.error('Cannot load module "' + data.name + '": ' + data.error.message);

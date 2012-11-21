@@ -1,7 +1,6 @@
 var fs = require('fs');
-var core = require('./api/core');
 
-var modules = { core: core };
+var modules = { };
 
 function api(module, action, data, callback) {
 	if (!modules.hasOwnProperty(module)) {

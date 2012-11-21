@@ -73,7 +73,7 @@ define(function(require) {
 	 * SERVER MODULES METHODS *
 	 **************************/
 
-	_.each(window.config.modules, function(params, id) {
+	_.each(window.config.server, function(params, id) {
 		server[id.toLowerCase()] = function() {
 			return socket(id, _.object(params, arguments));
 		};

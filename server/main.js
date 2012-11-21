@@ -3,7 +3,8 @@ var fs = require('fs');
 var Logger = require('./logger');
 var server = require('./server');
 var socket = require('./socket');
-var modules = require('./handlers');
+var modules = require('./modules');
+var handlers = require('./handlers');
 
 function addListeners(srv) {
 	srv
@@ -17,7 +18,7 @@ function addListeners(srv) {
 		var requestId = data.requestId;
 		Logger.info(id, requestId, 'RECIVED', JSON.stringify(data));
 
-		modules.resolve(data.type, data.data, function(error, response) {
+		handlers.resolve(data.type, data.data, function(error, response) {
 			var result = {
 				requestId: requestId,
 				success: !error,
@@ -40,7 +41,15 @@ addListeners(socket);
 
 server.on('open-index', function(callback) {
 	fs.readFile('index.mustache', function(err, data) {
-		callback(err, err || data.toString().replace('{{modules}}', JSON.stringify(modules.getApi())));
+		if (err)
+			return callback(err);
+
+		modules.ready(function() {
+			var html = data && data.toString()
+				.replace('{{modules}}', JSON.stringify(modules.getManifests()))
+				.replace('{{handlers}}', JSON.stringify(handlers.getApi()))
+			callback(null, html);
+		});
 	});
 });
 

@@ -1,9 +1,9 @@
 define(function(require) {
 
-	if (window.GlobalModules)
-		return GlobalModules;
+	if (window.Global)
+		return Global;
 
-	return window.GlobalModules = {
+	return window.Global = {
 
 		_modules: {},
 

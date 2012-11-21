@@ -8,8 +8,8 @@ define(function(require) {
 	var server = require('core/server')
 	var Bus = require('core/bus');
 
+	var modules = window.config.modules;
 	var defaultManifest = {
-		"description": "",
 		"server": {
 			"shell": "node server/main"
 		},
@@ -26,7 +26,7 @@ define(function(require) {
 	}
 
 	function associativeMap(associative, iterator) {
-		_.object(_.keys(associative), _.map(associative, iterator));
+		return _.object(_.keys(associative), _.map(associative, iterator));
 	}
 
 	function init(cfg) {
@@ -38,36 +38,35 @@ define(function(require) {
 			document.getElementById('main-container').appendChild(dom);
 		});
 
-		server.api('core', 'get-initial-data').then(function(data) {
-			data.modules.forEach(function(data) {
-				if (!data.success)
-					return console.error('Cannot load module "' + data.name + '": ' + data.error.message);
+		modules.forEach(function(data) {
+			if (!data.success)
+				return console.error('Cannot load module "' + data.name + '": ' + data.error.message);
 
-				_.each(defaultManifest, function(section, name) {
-					_.defaults(data.config[name], section);
-				});
+			var manifest = data.manifest;
+			_.each(defaultManifest, function(section, name) {
+				_.defaults(manifest[name], section);
+			});
 
-				var base = 'mods/' + data.name + '/' + data.config.client['root-folder'];
+			var base = 'mods/' + data.name + '/' + manifest.client['root-folder'];
 
-				if (base[base.length - 1] === '/')
-					base.length--;
+			if (base[base.length - 1] === '/')
+				base.length--;
 
-				var toRoot = new Array(base.split('/').length + 1).join('../');
-				var localConfig = _.defaults({
-					context: data.name,
-					baseUrl: base,
-					paths: {}
-				}, config);
+			var toRoot = new Array(base.split('/').length + 1).join('../');
+			var localConfig = _.defaults({
+				context: data.name,
+				baseUrl: base,
+				paths: {}
+			}, config);
 
-				_.each(config.paths, function(value, key) {
-					localConfig.paths[key] = toRoot + value;
-				});
+			_.each(config.paths, function(value, key) {
+				localConfig.paths[key] = toRoot + value;
+			});
 
-				_.extend(localConfig, data.config.client['requirejs-config']);
+			_.extend(localConfig, manifest.client['requirejs-config']);
 
-				requirejs.config(localConfig)([ data.config.client.main ], function(main) {
-					main.init(modulesBus);
-				});
+			requirejs.config(localConfig)([ manifest.client.main ], function(main) {
+				main.init(modulesBus);
 			});
 		});
 	}

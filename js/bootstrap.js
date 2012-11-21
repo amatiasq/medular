@@ -29,10 +29,10 @@
 		}
 	};
 
-	require.config(config)([ '../js/main' ], function(main) {
-		setTimeout(function() {
-			main.init(config);
-		}, 1000);
+	var coreRequire = require.config(config)
+
+	coreRequire([ 'main' ], function(main) {
+		main.init(config);
 	});
 
 })();

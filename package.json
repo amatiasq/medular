@@ -1,0 +1,14 @@
+{
+	"name": "medular",
+	"version": "0.1.0",
+	"description": "A base library to develop client and server modular web apps",
+	"author": "A. Matías Quezada <amatiasq@gmail.com>",
+	"dependencies": {
+		"underscore": "1.4.x",
+		"node-static": "0.6.x",
+		"websocket": "1.0.x",
+		"mysql": "2.0.x"
+	},
+	"devDependencies": {
+	}
+}

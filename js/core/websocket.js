@@ -1,6 +1,6 @@
 define(function(require) {
 
-	var GlobalModules = require('core/global');
+	var _ = require('Underscore');
 	var Promise = require('core/promise');
 
 	var clientId = window.config.clientId;
@@ -64,8 +64,5 @@ define(function(require) {
 
 	}
 
-	if (!GlobalModules.isRegistered('websocket'))
-		GlobalModules.register('websocket', typeof WebSocket !== 'undefined' ? nativeWS() : fallback)
-
-	return GlobalModules.get('websocket');
+	return typeof WebSocket !== 'undefined' ? nativeWS() : fallback
 });

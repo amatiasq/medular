@@ -3,35 +3,44 @@
 	var config = {
 		context: 'core',
 		baseUrl: 'js',
-		enforceDefine: true,
+		//enforceDefine: true,
 
 		// To bypass browser cache uncomment this...
-		//urlArgs: "bust=" +  (new Date()).getTime(),
+		//urlArgs: "nocache=" +  (new Date()).getTime(),
 
 		paths: {
-			'vendor': 'vendor',
-			'core': 'core',
-			'tmpl': 'tmpl',
-			'css': 'css',
-
 			'$': 'vendor/jquery',
 			'Underscore': 'vendor/underscore',
 		},
 
 		shim: {
-			'$': {
-				'exports': '$'
-			},
-
-			'Underscore': {
-				'exports': '_'
-			}
+			'$': { exports: '$' },
+			'Underscore': { exports: '_' }
 		}
 	};
 
-	var coreRequire = require.config(config)
+	define('--my-unknown-module', function(require) {
+		require('$');
+		require('Underscore');
+		window.jQuery = undefined;
 
-	coreRequire([ 'main' ], function(main) {
+
+		// HERE WE ADD THE REQUIREJS MODULES WE WANT OUR APP MODULES TO SEE.
+
+
+		define('$', function() { return window.$.noConflict() });
+		define('Underscore', function() { return window._.noConflict() });
+
+		define('css', function() { return require('css'); });
+		define('tmpl', function() { return require('tmpl'); });
+
+		define('core/view', function() { return require('core/view'); });
+		define('core/server', function() { return require('core/server'); });
+		define('core/emitter', function() { return require('core/emitter'); });
+		define('core/promise', function() { return require('core/promise'); });
+	});
+
+	requirejs.config(config)([ 'main', '--my-unknown-module' ], function(main) {
 		main.init(config);
 	});
 
